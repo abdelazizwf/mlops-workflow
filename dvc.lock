@@ -1,0 +1,35 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: mkdir -p prepared_data && uv run src/prepare_data.py
+    deps:
+    - path: data/test.csv
+      hash: md5
+      md5: 7533b82eae4b582610cbd68aa636b017
+      size: 28629
+    - path: data/train.csv
+      hash: md5
+      md5: 2309cc5f04782ed9bb6016d9f4e381cf
+      size: 61194
+    - path: src/prepare_data.py
+      hash: md5
+      md5: 40fbbee534d61a89078f144ca3428772
+      size: 1931
+    outs:
+    - path: prepared_data/
+      hash: md5
+      md5: a5cbda8fcb5be4a96f5a8db08c0bc769.dir
+      size: 224426
+      nfiles: 3
+  train:
+    cmd: uv run src/train.py
+    deps:
+    - path: prepared_data/
+      hash: md5
+      md5: a5cbda8fcb5be4a96f5a8db08c0bc769.dir
+      size: 224426
+      nfiles: 3
+    - path: src/train.py
+      hash: md5
+      md5: 2aae46559fb799b3f333f05923721f07
+      size: 529

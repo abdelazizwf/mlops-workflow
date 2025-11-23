@@ -1,0 +1,15 @@
+stages:
+  prepare_data:
+    cmd: mkdir -p prepared_data && uv run src/prepare_data.py
+    deps:
+      - src/prepare_data.py
+      - data/train.csv
+      - data/test.csv
+    outs:
+      - prepared_data/
+
+  train:
+    cmd: uv run src/train.py
+    deps:
+      - src/train.py
+      - prepared_data/
