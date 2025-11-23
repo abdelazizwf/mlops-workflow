@@ -13,21 +13,25 @@ stages:
       size: 61194
     - path: src/prepare_data.py
       hash: md5
-      md5: 40fbbee534d61a89078f144ca3428772
-      size: 1931
+      md5: 4806532f7e687a6bc29799133b318e0c
+      size: 2071
+    params:
+      params.yaml:
+        data.random_seed: 42
+        data.val_split: 0.15
     outs:
     - path: prepared_data/
       hash: md5
-      md5: a5cbda8fcb5be4a96f5a8db08c0bc769.dir
-      size: 224426
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
       nfiles: 3
   train:
     cmd: uv run src/train.py
     deps:
     - path: prepared_data/
       hash: md5
-      md5: a5cbda8fcb5be4a96f5a8db08c0bc769.dir
-      size: 224426
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
       nfiles: 3
     - path: src/train.py
       hash: md5

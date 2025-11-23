@@ -5,6 +5,9 @@ stages:
       - src/prepare_data.py
       - data/train.csv
       - data/test.csv
+    params:
+      - data.random_seed
+      - data.val_split
     outs:
       - prepared_data/
 

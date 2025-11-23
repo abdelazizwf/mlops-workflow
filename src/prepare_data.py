@@ -2,6 +2,7 @@ import re
 
 import numpy as np
 import pandas as pd
+from dvc.api import params_show
 from sklearn import set_config
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import KNNImputer, SimpleImputer
@@ -12,7 +13,9 @@ from sklearn.preprocessing import (
     OneHotEncoder,
 )
 
-np.random.seed(0)
+params = params_show(stages="prepare_data")["data"]
+
+np.random.seed(params["random_seed"])
 set_config(transform_output="pandas")
 
 def load_data(path):
@@ -32,7 +35,7 @@ X = train_data.loc[:, train_data.columns != "Survived"]
 y = train_data[["Survived"]]
 
 X_train, X_val, y_train, y_val = train_test_split(
-    X, y, shuffle=True, test_size=0.15, random_state=0
+    X, y, shuffle=True, test_size=params["val_split"], random_state=params["random_seed"]
 )
 
 test = load_data("data/test.csv")

@@ -1,0 +1,3 @@
+data:
+  val_split: 0.15
+  random_seed: 42
