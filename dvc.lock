@@ -35,5 +35,39 @@ stages:
       nfiles: 3
     - path: src/train.py
       hash: md5
-      md5: 8d6d56566a877e1690cb8b57c8b74b11
-      size: 771
+      md5: 730c9084c9f93a7ad27ee1392b509c9f
+      size: 884
+  tune_hparams:
+    cmd: uv run src/tune_hparams.py
+    deps:
+    - path: prepared_data/
+      hash: md5
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
+      nfiles: 3
+    - path: src/tune_hparams.py
+      hash: md5
+      md5: a778a69383f725d8eec1344fcbb627b5
+      size: 1707
+    params:
+      params.yaml:
+        training.n_trials: 40
+  predict:
+    cmd: uv run src/generate_predictions.py
+    deps:
+    - path: prepared_data/
+      hash: md5
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
+      nfiles: 3
+    - path: src/generate_predictions.py
+      hash: md5
+      md5: d432738de1ddf91352d3ad68dd7ef312
+      size: 637
+    params:
+      params.yaml:
+        model.svc:
+          C: 0.64535
+          kernel: rbf
+          gamma: 0.0487
+          degree: 1

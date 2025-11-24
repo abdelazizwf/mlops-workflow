@@ -16,3 +16,19 @@ stages:
     deps:
       - src/train.py
       - prepared_data/
+
+  tune_hparams:
+    cmd: uv run src/tune_hparams.py
+    deps:
+      - src/tune_hparams.py
+      - prepared_data/
+    params:
+      - training.n_trials
+
+  predict:
+    cmd: uv run src/generate_predictions.py
+    deps:
+      - src/generate_predictions.py
+      - prepared_data/
+    params:
+      - model.svc

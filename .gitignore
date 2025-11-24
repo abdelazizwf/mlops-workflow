@@ -11,3 +11,4 @@ wheels/
 /data
 /prepared_data
 mlruns.db
+subs.csv

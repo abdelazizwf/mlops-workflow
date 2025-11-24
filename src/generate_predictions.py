@@ -1,0 +1,21 @@
+import pandas as pd
+from dvc.api import params_show
+from sklearn.svm import SVC
+
+train_data = pd.read_csv("prepared_data/train.csv")
+val_data = pd.read_csv("prepared_data/val.csv")
+test_data = pd.read_csv("prepared_data/test.csv", index_col="PassengerId")
+
+train_data = pd.concat([train_data, val_data], axis=0, ignore_index=True)
+X = train_data.drop(columns=["PassengerId", "Survived"])
+y = train_data["Survived"]
+
+hparams = params_show()["model"]["svc"]
+model = SVC(**hparams)
+
+model.fit(X, y)
+preds = model.predict(test_data)
+
+pd.DataFrame(
+    {"PassengerId": test_data.index, "Survived": preds},
+).to_csv("./subs.csv", index=False)

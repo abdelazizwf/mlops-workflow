@@ -1,3 +1,13 @@
 data:
   val_split: 0.15
   random_seed: 42
+
+training:
+  n_trials: 40
+
+model:
+  svc:
+    C: 0.64535
+    kernel: "rbf"
+    gamma: 0.0487
+    degree: 1
