@@ -11,3 +11,7 @@ model:
     kernel: "rbf"
     gamma: 0.0487
     degree: 1
+
+  nn:
+    lr: 0.05
+    momentum: 0.9

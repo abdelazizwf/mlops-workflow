@@ -12,3 +12,4 @@ wheels/
 /prepared_data
 mlruns.db
 subs.csv
+mlartifacts/
