@@ -92,10 +92,35 @@ stages:
   train_nn:
     cmd: uv run src/train_nn.py
     deps:
+    - path: src/model.py
+      hash: md5
+      md5: e97057b22b44b73dd14f6d7d3f2edf15
+      size: 2676
     - path: src/train_nn.py
       hash: md5
-      md5: 827bc35294502b3482f259eb42440c19
-      size: 1009
+      md5: 6e0079737f6304d1a37e78c49d47efee
+      size: 1156
+    - path: tensor_data/
+      hash: md5
+      md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
+      size: 135642
+      nfiles: 2
+    params:
+      params.yaml:
+        model.nn:
+          lr: 0.05
+          momentum: 0.9
+  tune_nn:
+    cmd: uv run src/tune_nn.py
+    deps:
+    - path: src/model.py
+      hash: md5
+      md5: e97057b22b44b73dd14f6d7d3f2edf15
+      size: 2676
+    - path: src/tune_nn.py
+      hash: md5
+      md5: b2e750e665fc75c6106f22fea755baad
+      size: 1824
     - path: tensor_data/
       hash: md5
       md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir

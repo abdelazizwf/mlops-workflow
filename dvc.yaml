@@ -47,3 +47,12 @@ stages:
       - src/train_nn.py
       - src/model.py
       - tensor_data/
+    params:
+      - model.nn
+
+  tune_nn:
+    cmd: uv run src/tune_nn.py
+    deps:
+      - src/tune_nn.py
+      - src/model.py
+      - tensor_data/
