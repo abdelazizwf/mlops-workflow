@@ -10,3 +10,4 @@ wheels/
 .venv
 /data
 /prepared_data
+mlruns.db
