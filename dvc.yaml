@@ -32,3 +32,18 @@ stages:
       - prepared_data/
     params:
       - model.svc
+
+  data_to_tensors:
+    cmd: mkdir -p tensor_data && uv run src/data_to_tensors.py
+    deps:
+      - src/data_to_tensors.py
+      - prepared_data/
+    outs:
+      - tensor_data/
+
+  train_nn:
+    cmd: uv run src/train_nn.py
+    deps:
+      - src/train_nn.py
+      - src/model.py
+      - tensor_data/

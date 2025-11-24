@@ -13,3 +13,4 @@ wheels/
 mlruns.db
 subs.csv
 mlartifacts/
+/tensor_data

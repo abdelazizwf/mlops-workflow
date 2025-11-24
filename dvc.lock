@@ -71,3 +71,33 @@ stages:
           kernel: rbf
           gamma: 0.0487
           degree: 1
+  data_to_tensors:
+    cmd: mkdir -p tensor_data && uv run src/data_to_tensors.py
+    deps:
+    - path: prepared_data/
+      hash: md5
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
+      nfiles: 3
+    - path: src/data_to_tensors.py
+      hash: md5
+      md5: 089fd1901dde6ba9d7315a91c8879f9d
+      size: 799
+    outs:
+    - path: tensor_data/
+      hash: md5
+      md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
+      size: 135642
+      nfiles: 2
+  train_nn:
+    cmd: uv run src/train_nn.py
+    deps:
+    - path: src/train_nn.py
+      hash: md5
+      md5: 827bc35294502b3482f259eb42440c19
+      size: 1009
+    - path: tensor_data/
+      hash: md5
+      md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
+      size: 135642
+      nfiles: 2
