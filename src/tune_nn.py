@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import mlflow
 import optuna
 import torch
@@ -27,12 +29,13 @@ def objective(trial):
         trainer = Trainer(
             max_epochs=10, logger=logger,
             val_check_interval=None, num_sanity_val_steps=0,
-            enable_checkpointing=False,
+            enable_checkpointing=False, log_every_n_steps=10,
         )
         trainer.fit(model, train_dataloaders=train_dataloader)
         trainer.test(model, dataloaders=val_dataloader)
         test_loss = logger.experiment.get_metric_history(run.info.run_id, "test_loss")[-1].value
-        trial.set_user_attr("run_name", run.info.run_name)
+        trial.set_user_attr("run_id", run.info.run_id)
+        trial.set_user_attr("model_weights", deepcopy(model.model.state_dict()))
     return test_loss
 
 with mlflow.start_run():
@@ -40,9 +43,27 @@ with mlflow.start_run():
     params = params_show(stages="tune_hparams")["training"]
     n_trials = params["n_trials"]
     study.optimize(objective, n_trials=n_trials)
+    
     best_params = study.best_params
-    print(best_params)
     best_score = study.best_value
-    best_params["run_name"] = study.best_trial.user_attrs["run_name"]
+    user_attrs = study.best_trial.user_attrs
+    
+    best_weights = user_attrs["model_weights"]
+    model = Model(**best_params)
+    model.model.load_state_dict(best_weights)
+    model_in = next(iter(train_dataloader))[0]
+    model_out = model.predict_step(model_in)
+    signture = mlflow.models.infer_signature(
+        model_in.detach().numpy(),
+        model_out.detach().numpy()
+    )
+    
+    best_params["best_run_url"] = mlflow.get_tracking_uri() + "/#/experiments/" + str(0) + "/runs/" + user_attrs["run_id"]
     mlflow.log_params(best_params)
     mlflow.log_metric("test_loss", best_score)
+    mlflow.pytorch.log_model(
+        model,
+        name="basic_tuned_nn",
+        registered_model_name="nn-1",
+        signature=signture
+    )
