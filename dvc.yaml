@@ -56,3 +56,13 @@ stages:
       - src/tune_nn.py
       - src/model.py
       - tensor_data/
+    params:
+      - training
+
+  predict_nn:
+    cmd: uv run src/predict_nn.py
+    deps:
+      - src/predict_nn.py
+      - prepared_data/
+    params:
+      - predict

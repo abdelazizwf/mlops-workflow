@@ -126,3 +126,24 @@ stages:
       md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
       size: 135642
       nfiles: 2
+    params:
+      params.yaml:
+        training:
+          n_trials: 40
+  predict_nn:
+    cmd: uv run src/predict_nn.py
+    deps:
+    - path: prepared_data/
+      hash: md5
+      md5: 64446be3de925416a0dd12f5e6d3d81d.dir
+      size: 224483
+      nfiles: 3
+    - path: src/predict_nn.py
+      hash: md5
+      md5: 5d09a4cdfb7be670ae42df436de8dd01
+      size: 716
+    params:
+      params.yaml:
+        predict:
+          model_name: nn-1
+          model_version: 3

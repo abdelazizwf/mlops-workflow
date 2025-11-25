@@ -5,6 +5,10 @@ data:
 training:
   n_trials: 40
 
+predict:
+  model_name: "nn-1"
+  model_version: 3
+
 model:
   svc:
     C: 0.64535
@@ -13,5 +17,5 @@ model:
     degree: 1
 
   nn:
-    lr: 0.05
-    momentum: 0.9
+    lr: 0.231452
+    momentum: 0.790705
