@@ -13,11 +13,11 @@ stages:
       size: 61194
     - path: src/prepare_data.py
       hash: md5
-      md5: 4806532f7e687a6bc29799133b318e0c
-      size: 2071
+      md5: bcd12a8b2a4036f7825c8f83d4619cb7
+      size: 2096
     params:
       params.yaml:
-        data.random_seed: 42
+        base.random_seed: 42
         data.val_split: 0.15
     outs:
     - path: prepared_data/
@@ -35,8 +35,11 @@ stages:
       nfiles: 3
     - path: src/train.py
       hash: md5
-      md5: 730c9084c9f93a7ad27ee1392b509c9f
-      size: 884
+      md5: f094b9a3c1c4089ff1b456b6728b1152
+      size: 1067
+    params:
+      params.yaml:
+        tracking_server.experiment_name: mlops-workflow
   tune_hparams:
     cmd: uv run src/tune_hparams.py
     deps:
@@ -47,10 +50,11 @@ stages:
       nfiles: 3
     - path: src/tune_hparams.py
       hash: md5
-      md5: a778a69383f725d8eec1344fcbb627b5
-      size: 1707
+      md5: 819e0b5668ba43b88036cfc47036382d
+      size: 2060
     params:
       params.yaml:
+        tracking_server.experiment_name: mlops-workflow
         training.n_trials: 40
   predict:
     cmd: uv run src/generate_predictions.py
@@ -98,8 +102,8 @@ stages:
       size: 2676
     - path: src/train_nn.py
       hash: md5
-      md5: 6e0079737f6304d1a37e78c49d47efee
-      size: 1156
+      md5: 8847f04285be6520d3b87013210d9d37
+      size: 1364
     - path: tensor_data/
       hash: md5
       md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
@@ -107,9 +111,10 @@ stages:
       nfiles: 2
     params:
       params.yaml:
-        model.nn:
-          lr: 0.05
-          momentum: 0.9
+        model_params.nn:
+          lr: 0.231452
+          momentum: 0.790705
+        tracking_server.experiment_name: mlops-workflow
   tune_nn:
     cmd: uv run src/tune_nn.py
     deps:
@@ -119,8 +124,8 @@ stages:
       size: 2676
     - path: src/tune_nn.py
       hash: md5
-      md5: 3ab7b071e2a8ea1d5d518bb6af87b2e4
-      size: 2527
+      md5: f99917cc71aac3729e8c7614677335e6
+      size: 2774
     - path: tensor_data/
       hash: md5
       md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
@@ -128,8 +133,11 @@ stages:
       nfiles: 2
     params:
       params.yaml:
+        tracking_server.experiment_name: mlops-workflow
         training:
           n_trials: 40
+          batch_size: 64
+          epochs: 10
   predict_nn:
     cmd: uv run src/predict_nn.py
     deps:
@@ -140,10 +148,10 @@ stages:
       nfiles: 3
     - path: src/predict_nn.py
       hash: md5
-      md5: 5d09a4cdfb7be670ae42df436de8dd01
-      size: 716
+      md5: 935120ef8c6aa9a9a13c71f51a8828f3
+      size: 812
     params:
       params.yaml:
         predict:
           model_name: nn-1
-          model_version: 3
+          model_version: 4

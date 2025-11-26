@@ -2,11 +2,17 @@ import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from dvc.api import params_show
+from omegaconf import OmegaConf
 from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
 
-mlflow.set_tracking_uri("http://localhost:8080")
+conf  = OmegaConf.load("./params.yaml")
+tracking_uri = conf.tracking_server.uri
+experiment_name = conf.tracking_server.experiment_name
+n_trials = conf.training.n_trials
+
+mlflow.set_tracking_uri(tracking_uri)
+mlflow.set_experiment(experiment_name)
 
 train_data = pd.read_csv("prepared_data/train.csv")
 val_data = pd.read_csv("prepared_data/val.csv")
@@ -24,6 +30,7 @@ def objective(trial):
     hparams = {
         "kernel": trial.suggest_categorical("kernel", ["linear", "rbf", "poly"]),
         "C": trial.suggest_float("C", 1e-2, 1e2, log=True),
+        "max_iter": trial.suggest_int("max_iter", 1000, 5000),
     }
     
     kernel = hparams["kernel"]
@@ -32,22 +39,26 @@ def objective(trial):
     if kernel == "poly":
         hparams["degree"] = trial.suggest_int("degree", 1, 10)
     
-    with mlflow.start_run(nested=True):
+    with mlflow.start_run(nested=True) as run:
         mlflow.log_params(hparams)
         
-        model = SVC(**hparams, max_iter=2000)
+        model = SVC(**hparams)
         score = np.mean(cross_val_score(model, X, y))
         
         mlflow.log_metric("cross_val_accuracy", score)
+        
+        trial.set_user_attr("run_name", run.info.run_name)
     
     return score
 
 with mlflow.start_run():
     study = optuna.create_study(direction="maximize")
-    params = params_show(stages="tune_hparams")["training"]
-    n_trials = params["n_trials"]
     study.optimize(objective, n_trials=n_trials)
-    best_params = study.best_params
-    best_score = study.best_value
-    mlflow.log_params(best_params)
-    mlflow.log_metric("cross_val_accuracy", best_score)
+    
+    best_trial = study.best_trial
+    conf.model_params.svc = best_trial.params
+    OmegaConf.save(conf, "./params.yaml")
+    
+    best_trial.params.update(best_trial.user_attrs)
+    mlflow.log_params(best_trial.params)
+    mlflow.log_metric("cross_val_accuracy", best_trial.value)

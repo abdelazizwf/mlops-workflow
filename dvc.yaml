@@ -6,7 +6,7 @@ stages:
       - data/train.csv
       - data/test.csv
     params:
-      - data.random_seed
+      - base.random_seed
       - data.val_split
     outs:
       - prepared_data/
@@ -16,6 +16,8 @@ stages:
     deps:
       - src/train.py
       - prepared_data/
+    params:
+      - tracking_server.experiment_name
 
   tune_hparams:
     cmd: uv run src/tune_hparams.py
@@ -24,6 +26,7 @@ stages:
       - prepared_data/
     params:
       - training.n_trials
+      - tracking_server.experiment_name
 
   predict:
     cmd: uv run src/generate_predictions.py
@@ -31,7 +34,7 @@ stages:
       - src/generate_predictions.py
       - prepared_data/
     params:
-      - model.svc
+      - model_params.svc
 
   data_to_tensors:
     cmd: mkdir -p tensor_data && uv run src/data_to_tensors.py
@@ -48,7 +51,8 @@ stages:
       - src/model.py
       - tensor_data/
     params:
-      - model.nn
+      - model_params.nn
+      - tracking_server.experiment_name
 
   tune_nn:
     cmd: uv run src/tune_nn.py
@@ -58,6 +62,7 @@ stages:
       - tensor_data/
     params:
       - training
+      - tracking_server.experiment_name
 
   predict_nn:
     cmd: uv run src/predict_nn.py

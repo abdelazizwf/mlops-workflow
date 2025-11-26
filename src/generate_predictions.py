@@ -1,6 +1,9 @@
 import pandas as pd
-from dvc.api import params_show
+from omegaconf import OmegaConf
 from sklearn.svm import SVC
+
+conf = OmegaConf.load("./params.yaml")
+svc_params = conf.model_params.svc
 
 train_data = pd.read_csv("prepared_data/train.csv")
 val_data = pd.read_csv("prepared_data/val.csv")
@@ -10,8 +13,7 @@ train_data = pd.concat([train_data, val_data], axis=0, ignore_index=True)
 X = train_data.drop(columns=["PassengerId", "Survived"])
 y = train_data["Survived"]
 
-hparams = params_show()["model"]["svc"]
-model = SVC(**hparams)
+model = SVC(**svc_params)
 
 model.fit(X, y)
 preds = model.predict(test_data)

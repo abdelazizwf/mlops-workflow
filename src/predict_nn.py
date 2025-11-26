@@ -1,9 +1,14 @@
 import mlflow
 import pandas as pd
 import torch
-from dvc.api import params_show
+from omegaconf import OmegaConf
 
-mlflow.set_tracking_uri("http://localhost:8080")
+conf  = OmegaConf.load("./params.yaml")
+tracking_uri = conf.tracking_server.uri
+model_name = conf.predict.model_name
+model_version = conf.predict.model_version
+
+mlflow.set_tracking_uri(tracking_uri)
 
 test_data = pd.read_csv("prepared_data/test.csv", index_col="PassengerId")
 X_test = torch.tensor(
@@ -12,9 +17,8 @@ X_test = torch.tensor(
 )
 test_dataset = torch.utils.data.TensorDataset(X_test)
 
-params = params_show()["predict"]
 model = mlflow.pytorch.load_model(
-    f"models:/{params["model_name"]}/{params["model_version"]}"
+    f"models:/{model_name}/{model_version}"
 )
 
 preds = torch.nn.functional.sigmoid(

@@ -1,21 +1,22 @@
+base:
+  random_seed: 42
 data:
   val_split: 0.15
-  random_seed: 42
-
 training:
   n_trials: 40
-
+  batch_size: 64
+  epochs: 10
 predict:
-  model_name: "nn-1"
-  model_version: 3
-
-model:
+  model_name: nn-1
+  model_version: 4
+tracking_server:
+  uri: http://localhost:8080
+  experiment_name: mlops-workflow
+model_params:
   svc:
-    C: 0.64535
-    kernel: "rbf"
-    gamma: 0.0487
-    degree: 1
-
+    kernel: linear
+    C: 0.22423877402195014
+    max_iter: 1901
   nn:
-    lr: 0.231452
-    momentum: 0.790705
+    lr: 0.19041006471082061
+    momentum: 0.9406384296098169

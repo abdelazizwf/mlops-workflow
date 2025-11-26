@@ -3,20 +3,28 @@ from copy import deepcopy
 import mlflow
 import optuna
 import torch
-from dvc.api import params_show
 from lightning import Trainer
 from lightning.pytorch.loggers import MLFlowLogger
+from omegaconf import OmegaConf
 from torch.utils.data import DataLoader
 
 from model import Model
 
-mlflow.set_tracking_uri("http://localhost:8080")
+conf  = OmegaConf.load("./params.yaml")
+tracking_uri = conf.tracking_server.uri
+experiment_name = conf.tracking_server.experiment_name
+n_trials = conf.training.n_trials
+batch_size = conf.training.batch_size
+epochs = conf.training.epochs
+
+mlflow.set_tracking_uri(tracking_uri)
+mlflow.set_experiment(experiment_name)
 
 train_dataset = torch.load("tensor_data/train_dataset.pt", weights_only=False)
 val_dataset = torch.load("tensor_data/val_dataset.pt", weights_only=False)
 
-train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-val_dataloader = DataLoader(val_dataset, batch_size=64)
+train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
 
 def objective(trial):
     hparams = {
@@ -24,10 +32,10 @@ def objective(trial):
         "momentum": trial.suggest_float("momentum", 0.1, 1.0),
     }
     with mlflow.start_run(nested=True) as run:
-        logger = MLFlowLogger(run_id=run.info.run_id, tracking_uri=mlflow.get_tracking_uri())
+        logger = MLFlowLogger(run_id=run.info.run_id, tracking_uri=tracking_uri)
         model = Model(**hparams)
         trainer = Trainer(
-            max_epochs=10, logger=logger,
+            max_epochs=epochs, logger=logger,
             val_check_interval=None, num_sanity_val_steps=0,
             enable_checkpointing=False, log_every_n_steps=10,
         )
@@ -40,16 +48,14 @@ def objective(trial):
 
 with mlflow.start_run():
     study = optuna.create_study()
-    params = params_show(stages="tune_hparams")["training"]
-    n_trials = params["n_trials"]
     study.optimize(objective, n_trials=n_trials)
     
-    best_params = study.best_params
-    best_score = study.best_value
-    user_attrs = study.best_trial.user_attrs
+    best_trial = study.best_trial
+    conf.model_params.nn = best_trial.params
+    OmegaConf.save(conf, "./params.yaml")
     
-    best_weights = user_attrs["model_weights"]
-    model = Model(**best_params)
+    best_weights = best_trial.user_attrs["model_weights"]
+    model = Model(**best_trial.params)
     model.model.load_state_dict(best_weights)
     model_in = next(iter(train_dataloader))[0]
     model_out = model.predict_step(model_in)
@@ -58,9 +64,11 @@ with mlflow.start_run():
         model_out.detach().numpy()
     )
     
-    best_params["best_run_url"] = mlflow.get_tracking_uri() + "/#/experiments/" + str(0) + "/runs/" + user_attrs["run_id"]
-    mlflow.log_params(best_params)
-    mlflow.log_metric("test_loss", best_score)
+    best_trial.params["best_run_url"] = (
+        mlflow.get_tracking_uri() + "/#/experiments/" + str(0) + "/runs/" + best_trial.user_attrs["run_id"]
+    )
+    mlflow.log_params(best_trial.params)
+    mlflow.log_metric("test_loss", best_trial.value)
     mlflow.pytorch.log_model(
         model,
         name="basic_tuned_nn",
