@@ -1,7 +1,8 @@
 schema: '2.0'
 stages:
   prepare_data:
-    cmd: mkdir -p prepared_data && uv run src/prepare_data.py
+    cmd: mkdir -p prepared_data && uv run src/prepare_data.py && uv run 
+      src/validate_data.py
     deps:
     - path: data/test.csv
       hash: md5
@@ -15,6 +16,10 @@ stages:
       hash: md5
       md5: bcd12a8b2a4036f7825c8f83d4619cb7
       size: 2096
+    - path: src/validate_data.py
+      hash: md5
+      md5: fddb1dff6d741965675c7c37c2fa3c1b
+      size: 2732
     params:
       params.yaml:
         base.random_seed: 42

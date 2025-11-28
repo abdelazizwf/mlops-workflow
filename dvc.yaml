@@ -1,8 +1,9 @@
 stages:
   prepare_data:
-    cmd: mkdir -p prepared_data && uv run src/prepare_data.py
+    cmd: mkdir -p prepared_data && uv run src/prepare_data.py && uv run src/validate_data.py
     deps:
       - src/prepare_data.py
+      - src/validate_data.py
       - data/train.csv
       - data/test.csv
     params:
