@@ -1,4 +1,4 @@
 [core]
-    remote = myremote
-['remote "myremote"']
-    url = /tmp/dvcstore
+    remote = temp_remote
+['remote "temp_remote"']
+    url = /home/abdelazizwf/.local/dvc/
