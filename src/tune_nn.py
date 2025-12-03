@@ -72,6 +72,7 @@ with mlflow.start_run():
     mlflow.pytorch.log_model(
         model,
         name="basic_tuned_nn",
+        code_paths=["./src/model.py"],
         registered_model_name="nn-1",
         signature=signture
     )

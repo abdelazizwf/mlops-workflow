@@ -57,8 +57,8 @@ stages:
       size: 2676
     - path: src/tune_nn.py
       hash: md5
-      md5: f99917cc71aac3729e8c7614677335e6
-      size: 2774
+      md5: 1bd8243f34fc99a92990267c21615636
+      size: 2813
     - path: tensor_data/
       hash: md5
       md5: 9baba9c5b6483bb63ec6ba7b429cd347.dir
@@ -68,7 +68,7 @@ stages:
       params.yaml:
         tracking_server.experiment_name: mlops-workflow
         training:
-          n_trials: 40
+          n_trials: 100
           batch_size: 64
           epochs: 10
   train_nn:

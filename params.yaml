@@ -3,7 +3,7 @@ base:
 data:
   val_split: 0.15
 training:
-  n_trials: 40
+  n_trials: 100
   batch_size: 64
   epochs: 10
 predict:
@@ -18,5 +18,5 @@ model_params:
     C: 0.22423877402195014
     max_iter: 1901
   nn:
-    lr: 0.38745095611548397
-    momentum: 0.6820577390413722
+    lr: 0.18926687260191663
+    momentum: 0.8781536399086847
